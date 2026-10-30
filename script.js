@@ -191,10 +191,93 @@ modal.classList.remove("show");
 });
 
 // EMAIL SUBSCRIPTION DEMO
+// CRUMBS IN THE DARK - REAL SUBSCRIPTION
 
-const subscribeForm = document.getElementById("subscribeForm");
-const emailInput = document.getElementById("emailInput");
-const formMessage = document.getElementById("formMessage");
+const SUPABASE_URL =
+"https://huejpnjwciemevyuwqtv.supabase.co";
+
+const SUPABASE_ANON_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh1ZWpwbmp3Y2llbWV2eXV3cXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTMzNjgzNTQsImV4cCI6MjEwODk0NDM1NH0.a7Q-YoT_mgcu2GwLfpbLoTycZpVt0KgnrGUeKjZY7rA";
+
+const subscribeForm =
+document.getElementById("subscribeForm");
+
+const emailInput =
+document.getElementById("emailInput");
+
+const formMessage =
+document.getElementById("formMessage");
+
+subscribeForm.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const email = emailInput.value.trim().toLowerCase();
+
+    if (!email || !emailInput.checkValidity()) {
+        formMessage.textContent = "Please enter a valid email.";
+        return;
+    }
+
+    const button = subscribeForm.querySelector("button");
+
+    button.disabled = true;
+    button.textContent = "PLEASE WAIT...";
+
+    formMessage.textContent = "Connecting to the release list...";
+
+    try {
+
+        const response = await fetch(
+            `${SUPABASE_URL}/functions/v1/subscribe`,
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_ANON_KEY,
+                    "Authorization": `Bearer ${SUPABASE_ANON_KEY}`
+                },
+
+                body: JSON.stringify({ email })
+            }
+        );
+
+        const result = await response.json();
+
+        if (response.status === 409) {
+            formMessage.textContent =
+            "This email is already on the release list.";
+            return;
+        }
+
+        if (!response.ok) {
+            throw new Error(result.error || "Subscription failed");
+        }
+
+        formMessage.innerHTML =
+        '<i class="fa-solid fa-check-circle"></i> You are on the list. Stay alert.';
+
+        subscribeForm.reset();
+
+    } catch (error) {
+
+        console.error(error);
+
+        formMessage.textContent =
+        "Something went wrong. Please try again.";
+
+    } finally {
+
+        button.disabled = false;
+
+        button.innerHTML =
+        'JOIN THE LIST <i class="fa-solid fa-arrow-right"></i>';
+
+    }
+
+});
+
 
 subscribeForm.addEventListener("submit", event => {
 
