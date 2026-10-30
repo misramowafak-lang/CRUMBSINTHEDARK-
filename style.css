@@ -11,6 +11,10 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  word-break: keep-all;
+  -ms-word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
   }
 
 html {
